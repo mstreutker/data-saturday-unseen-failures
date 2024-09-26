@@ -9,7 +9,7 @@ FILE_PATH_BRONS_ZONE = "/workspaces/local-pyspark/datalake/brons"
 FILE_PATH_ZILVER_ZONE = "/workspaces/local-pyspark/testresults/"
 
 
-@given("een voorraad uit het warehouse {warehouse} met de volgende stand")
+@given("a stock from warehouse {warehouse} with the following state")
 def given_a_file(context, warehouse) -> None:
     """Arrange: Prepare data for the test."""
 
@@ -26,7 +26,7 @@ def given_a_file(context, warehouse) -> None:
 #     return None
 
 
-@when("de voorraad wordt verwerkt")
+@when("the stock is being processed")
 def voorraad_verwerken(context) -> None:
     spark = context.spark
 
@@ -41,7 +41,7 @@ def voorraad_verwerken(context) -> None:
         context.exception = e
 
 
-@when("ik haal de huidige voorraad op")
+@when("I retrieve the current state")
 def haal_voorraad_op(context) -> None:
     spark = context.spark
 
@@ -50,7 +50,7 @@ def haal_voorraad_op(context) -> None:
     )
 
 
-@then("verwacht ik een voorraad van {current_stock_quantity} in het warehouse amsterdam")
+@then("I expect a stock of {current_stock_quantity} in warehouse amsterdam")
 def then_expect_the_following_result(context, current_stock_quantity) -> None:
     actueel_resultaat = context.goud_voorraad
     verwacht_resultaat = current_stock_quantity
@@ -58,7 +58,7 @@ def then_expect_the_following_result(context, current_stock_quantity) -> None:
     assert int(actueel_resultaat) == int(verwacht_resultaat)
 
 
-@given("er is niks aangeleverd")
+@given("nothing is delivered")
 def er_is_niks_aangeleverd(context):
     df = context.spark.createDataFrame([], StructType([]))
 
@@ -66,7 +66,7 @@ def er_is_niks_aangeleverd(context):
     df.createOrReplaceTempView(context.tablenaam)
 
 
-@then("verwacht ik een fout")
+@then("I expect an error")
 def then_verwacht_een_fout(context):
     assert context.exception is not None
     assert isinstance(
