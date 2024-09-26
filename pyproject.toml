@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "local-pyspark"
+dynamic = ["version"]
+license = { file = "LICENSE" }
+
+[project.optional-dependencies]
+dev = ["tox", "pytest", "build", "great_expectations"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+select = [
+    "E",
+    "W", # pycodestyle
+    "F", # pyflakes
+    "I", # isort
+    "N", # pep8-naming
+]
+
+[tool.mypy]
+warn_return_any = true
+
+[tool.setuptools.dynamic]
+version = { file = "__version__.py" }
