@@ -1,15 +1,15 @@
 from pyspark.sql import SparkSession  # type: ignore
 
-from localpyspark.voorraadbeheer.voorraadbeheer import lees_voorraad, verwerk_voorraad
+from localpyspark.stockmanagement.stockmanagement import process_stock, read_stock
 
 spark = SparkSession.builder.getOrCreate()
 
 FILE_PATH_LANDING_ZONE = "/workspaces/local-pyspark/data/"
-FILE_PATH_BRONS_ZONE = "/workspaces/local-pyspark/datalake/brons"
-FILE_PATH_ZILVER_ZONE = "/workspaces/local-pyspark/datalake/zilver"
+FILE_PATH_BRONZE_ZONE = "/workspaces/local-pyspark/datalake/bronze"
+FILE_PATH_SILVER_ZONE = "/workspaces/local-pyspark/datalake/silver"
 
-df_brons = lees_voorraad(spark, FILE_PATH_LANDING_ZONE)
-df_zilver = verwerk_voorraad(spark, df_brons, FILE_PATH_ZILVER_ZONE)
+df_bronze = read_stock(spark, FILE_PATH_LANDING_ZONE)
+df_silver = process_stock(spark, df_bronze, FILE_PATH_SILVER_ZONE)
 
-df_zilver.show()
-print(df_zilver.count())
+df_silver.show()
+print(df_silver.count())

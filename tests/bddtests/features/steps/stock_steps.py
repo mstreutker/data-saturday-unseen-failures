@@ -2,11 +2,11 @@ from behave import given, then, when  # type: ignore
 from pyspark.sql.types import StructType  # type: ignore
 from utils import table_to_spark  # type: ignore
 
-from localpyspark.voorraadbeheer.voorraadbeheer import bepaal_huidige_voorraad, verwerk_voorraad
+from localpyspark.stockmanagement.stockmanagement import determine_current_stock, process_stock
 
 FILE_PATH_LANDING_ZONE = "/workspaces/local-pyspark/data/"
-FILE_PATH_BRONS_ZONE = "/workspaces/local-pyspark/datalake/brons"
-FILE_PATH_ZILVER_ZONE = "/workspaces/local-pyspark/testresults/"
+FILE_PATH_BRONZE_ZONE = "/workspaces/local-pyspark/datalake/bronze"
+FILE_PATH_SILVER_ZONE = "/workspaces/local-pyspark/testresults/"
 
 
 @given("a stock from warehouse {warehouse} with the following state")
@@ -15,25 +15,19 @@ def given_a_file(context, warehouse) -> None:
 
     df = table_to_spark(context.spark, context.table)
 
-    context.tablenaam = "brons_voorraad"
+    context.tablenaam = "bronze_stock"
     df.createOrReplaceTempView(context.tablenaam)
     return None
 
 
-# @when("de voorraad wordt ingelezen")
-# def voorraad_inlezen(context) -> None:
-#     inlezen_voorraad()
-#     return None
-
-
 @when("the stock is being processed")
-def voorraad_verwerken(context) -> None:
+def stock_process(context) -> None:
     spark = context.spark
 
     try:
-        df_brons = context.spark.sql("select * from brons_voorraad")
-        context.zilver_voorraad = verwerk_voorraad(
-            spark, df_brons, f"{FILE_PATH_ZILVER_ZONE}/{context.scenario}"
+        df_bronze = context.spark.sql("select * from bronze_stock")
+        context.silver_stock = process_stock(
+            spark, df_bronze, f"{FILE_PATH_SILVER_ZONE}/{context.scenario}"
         )
 
         context.exception = None
@@ -42,32 +36,32 @@ def voorraad_verwerken(context) -> None:
 
 
 @when("I retrieve the current state")
-def haal_voorraad_op(context) -> None:
+def haal_stock_op(context) -> None:
     spark = context.spark
 
-    context.goud_voorraad = bepaal_huidige_voorraad(
-        spark, f"{FILE_PATH_ZILVER_ZONE}/{context.scenario}/Voorraad"
+    context.gold_stock = determine_current_stock(
+        spark, f"{FILE_PATH_SILVER_ZONE}/{context.scenario}/Stock"
     )
 
 
-@then("I expect a stock of {current_stock_quantity} in warehouse amsterdam")
+@then("I expect a total stock of {current_stock_quantity}")
 def then_expect_the_following_result(context, current_stock_quantity) -> None:
-    actueel_resultaat = context.goud_voorraad
-    verwacht_resultaat = current_stock_quantity
+    actual_result = context.gold_stock
+    expected_result = current_stock_quantity
 
-    assert int(actueel_resultaat) == int(verwacht_resultaat)
+    assert int(actual_result) == int(expected_result)
 
 
 @given("nothing is delivered")
-def er_is_niks_aangeleverd(context):
+def nothing_is_delivered(context):
     df = context.spark.createDataFrame([], StructType([]))
 
-    context.tablenaam = "brons_voorraad"
+    context.tablenaam = "bronze_stock"
     df.createOrReplaceTempView(context.tablenaam)
 
 
 @then("I expect an error")
-def then_verwacht_een_fout(context):
+def then_expected_an_error(context):
     assert context.exception is not None
     assert isinstance(
         context.exception, ValueError

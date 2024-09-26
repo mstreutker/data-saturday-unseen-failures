@@ -23,9 +23,3 @@ def sparksession(context):
 
 def before_feature(context, feature):
     use_fixture(sparksession, context)
-
-
-# def after_scenario(context, scenario):
-#     spark = context.spark
-#     spark.sql("DROP VIEW IF EXISTS brons_voorraad")
-# spark.catalog.dropTempView("brons_voorraad")

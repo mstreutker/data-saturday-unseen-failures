@@ -8,7 +8,7 @@ from pyspark.sql.functions import max as spark_max
 from pyspark.sql.functions import sum as spark_sum
 from pyspark.sql.types import IntegerType, StringType, StructField, StructType  # type: ignore
 
-ENTITY_NAME = "Voorraad"
+ENTITY_NAME = "Stock"
 ENTITY_SCHEMA = StructType(
     [
         StructField("SKU_ID", StringType(), True),
@@ -22,7 +22,7 @@ ENTITY_SCHEMA = StructType(
 )
 
 
-def lees_voorraad(spark: SparkSession, file_path: str) -> DataFrame:
+def read_stock(spark: SparkSession, file_path: str) -> DataFrame:
     df = (spark.read.option("header", True).option("sep", ";").option("locale", "en_US")).csv(
         file_path, schema=ENTITY_SCHEMA
     )
@@ -34,7 +34,7 @@ def lees_voorraad(spark: SparkSession, file_path: str) -> DataFrame:
     return df
 
 
-def verwerk_voorraad(spark: SparkSession, source_df: DataFrame, file_path_delta: str) -> DataFrame:
+def process_stock(spark: SparkSession, source_df: DataFrame, file_path_delta: str) -> DataFrame:
     delta_table_path = f"{file_path_delta}/{ENTITY_NAME}"
 
     if source_df.isEmpty():
@@ -54,11 +54,11 @@ def verwerk_voorraad(spark: SparkSession, source_df: DataFrame, file_path_delta:
     return spark.read.format("delta").load(delta_table_path)
 
 
-def bepaal_huidige_voorraad(spark: SparkSession, delta_table_path: str) -> int:
+def determine_current_stock(spark: SparkSession, delta_table_path: str) -> int:
     df = spark.read.format("delta").load(delta_table_path)
 
     # Find the maximum Current_Stock_Quantity per Warehouse and sum the results
-    actueel_resultaat = (
+    actual_result = (
         df.groupBy("Warehouse")
         .agg(spark_max("Current_Stock_Quantity").alias("Max_Stock"))
         .agg(spark_sum("Max_Stock").alias("Total_Stock"))
@@ -66,7 +66,7 @@ def bepaal_huidige_voorraad(spark: SparkSession, delta_table_path: str) -> int:
     )
 
     # Extract the total stock value
-    total_stock = actueel_resultaat[0]["Total_Stock"]
+    total_stock = actual_result[0]["Total_Stock"]
 
     # Return the result as an integer
     return int(total_stock)

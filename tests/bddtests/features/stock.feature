@@ -10,7 +10,7 @@ Scenario: Read stock for 1 warehouse
         |1083AA|48210|L|45|68|29,02|2024-09-05|amsterdam|
     When the stock is being processed
     And I retrieve the current state
-    Then I expect a stock of 50000 in warehouse amsterdam
+    Then I expect a total stock of 50000
 
 Scenario: Read stock for multiple warehouses
     Given a stock from warehouse amsterdam with the following state
@@ -23,7 +23,7 @@ Scenario: Read stock for multiple warehouses
         |1083AA|48210|L|45|68|29,02|2024-09-05|breda|
     When the stock is being processed
     And I retrieve the current state
-    Then I expect a stock of 100000 in warehouse amsterdam
+    Then I expect a total stock of 100000
 
 Scenario: A warehouse does not deliver data
     Given nothing is delivered

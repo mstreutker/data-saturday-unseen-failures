@@ -1,2 +1,2 @@
-def ingest_voorraad() -> None:
+def ingest_stock() -> None:
     return None

@@ -3,10 +3,10 @@ from delta import *
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType
 
-from localpyspark.voorraadbeheer.voorraadbeheer import (
-    bepaal_huidige_voorraad,
-    lees_voorraad,
-    verwerk_voorraad,
+from localpyspark.stockmanagement.stockmanagement import (
+    determine_current_stock,
+    process_stock,
+    read_stock,
 )
 
 
@@ -25,7 +25,7 @@ def spark():
     yield configure_spark_with_delta_pip(builder).getOrCreate()
 
 
-def test_lees_voorraad(spark):
+def test_read_stock(spark):
     # Arrange
     file_path = "/workspaces/data-saturday-unseen-failures/data/warehouse_inventory_pytest.csv"
     # Arrange: Define the expected data
@@ -46,23 +46,23 @@ def test_lees_voorraad(spark):
     expected_df = spark.createDataFrame(expected_data, expected_columns)
 
     # Act
-    actual_df = lees_voorraad(spark, file_path)
+    actual_df = read_stock(spark, file_path)
 
     # Assert
     assert expected_df.count() == actual_df.count()
 
 
-def test_verwerk_voorraad(spark):
+def test_process_stock(spark):
     # Arrange
     df = spark.createDataFrame([], StructType([]))
     file_path_delta = ""
 
     # Act & Assert
     with pytest.raises(ValueError):
-        verwerk_voorraad(spark, df, file_path_delta)
+        process_stock(spark, df, file_path_delta)
 
 
-def test_bepaal_huidige_voorraad(spark):
+def test_determine_current_stock(spark):
     # Arrange
     delta_table_path = "/workspaces/data-saturday-unseen-failures/testresults/pytest"
 
@@ -88,7 +88,7 @@ def test_bepaal_huidige_voorraad(spark):
     expected = 50000
 
     # Act
-    actual = bepaal_huidige_voorraad(spark, delta_table_path)
+    actual = determine_current_stock(spark, delta_table_path)
 
     # Assert
     assert actual == expected
