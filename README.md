@@ -1,6 +1,6 @@
 # Data Saturday - Unseen Failures
 An example project demonstrating how to develop and test a Python project locally using Spark.  
-Special thanks to my colleague [Jody](https://github.com/sqlkabouter) and [Wessel](https://github.com/TheScriptingGuy/docker-azure-spark) for contributing to this example.
+Special thanks to my colleagues [Jody](https://github.com/sqlkabouter) and [Wessel](https://github.com/TheScriptingGuy/docker-azure-spark) for contributing to this example.
 
 
 # Introduction
