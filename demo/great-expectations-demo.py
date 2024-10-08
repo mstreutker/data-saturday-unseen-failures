@@ -67,7 +67,7 @@ suite.add_expectation(
 
 # Create an expectation to validate if the Unit is always L
 suite.add_expectation(
-    gx.expectations.ExpectColumnDistinctValuesToEqualSet(column="Units", value_set=["L"])
+    gx.expectations.ExpectColumnDistinctValuesToEqualSet(column="Units", value_set=["L"]) # type: ignore
 )
 
 # Create an action to update the Data Docs once a validation has run

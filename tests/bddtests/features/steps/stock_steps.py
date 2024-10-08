@@ -36,7 +36,7 @@ def stock_process(context) -> None:
 
 
 @when("I retrieve the current state")
-def haal_stock_op(context) -> None:
+def retrieve_stock(context) -> None:
     spark = context.spark
 
     context.gold_stock = determine_current_stock(
